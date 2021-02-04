@@ -47,16 +47,47 @@ if __name__ == '__main__':
 
 	try:	
 		scales_driver = GoldBarsScale(driver)
-		print( len(scales_driver._get_weights()) )
-		left = list( range(4) )
-		right = list( range(4,8) )
-
+		coins = scales_driver._get_weights()
+		
+		## Do the case where one is left out and check for equality
+		mid_pt = len(coins)//2
+		left = list( range(0, mid_pt) )
+		right = list( range(mid_pt, 2 * mid_pt) )
+		
 		scales_driver._set_weights('left', left)
 		scales_driver._set_weights('right', right)
 		scales_driver._do_weigh()
 		result = scales_driver._get_weigh_result()
-		print( result )
 
+		if result == '=':
+			coins[-1].click()
+		else:
+			while mid_pt//2 > 0:
+				mid_pt //= 2
+				##The lightest weight is on the right so split again
+				if result == '>':
+					left = right[0: mid_pt]
+					right = right[mid_pt:]
+				else:
+					right = left[mid_pt:]
+					left = left[0:mid_pt]
+				
+				scales_driver._do_reset()
+				scales_driver._set_weights('left', left)
+				scales_driver._set_weights('right', right)
+				scales_driver._do_weigh()
+				result = scales_driver._get_weigh_result()
+
+			if result == '>':
+				coins[ right[0] ].click()
+			else: 
+				coins[ left[0] ].click()
+
+		##Verify that the correct element was selected
+		alert = driver.switch_to_alert()
+		assert( alert.text == 'Yay! You find it!')
+		alert.accept()
+		
 	finally:	
 		##Terminate the driver
 		driver.close()
