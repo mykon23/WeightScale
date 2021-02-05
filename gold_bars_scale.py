@@ -10,8 +10,8 @@ class GoldBarsScale:
 
 	##Returns the number of coins/bars to work with
 	def get_weights(self):
-		coins = self.driver.find_elements_by_xpath("//button[ contains( @id, 'coin_') ]")
-		return coins
+		weights = self.driver.find_elements_by_xpath("//button[ contains( @id, 'coin_') ]")
+		return weights
 
 	##Returns the weighing results of the scale
 	def get_weigh_result(self):
@@ -30,7 +30,6 @@ class GoldBarsScale:
 
 	##Sets the weights to the corresponding side
 	def set_weights(self, side, weights):
-		##TODO: Clean up this code so it doesn't check left or right
 		side_grid = None
 		if side == 'left':
 			side_grid = self.driver.find_elements_by_xpath("//input[contains(@id, 'left')]")
@@ -57,10 +56,10 @@ if __name__ == '__main__':
 
 	try:	
 		scales_driver = GoldBarsScale(driver)
-		coins = scales_driver.get_weights()
+		bars = scales_driver.get_weights()
 		
-		## Do the case where one is left out and check for equality
-		mid_pt = len(coins)//2
+		##Do an initial comparison between of two equal sized partitions regardless of even or odd number of bars
+		mid_pt = len(bars)//2
 		left = list( range(0, mid_pt) )
 		right = list( range(mid_pt, 2 * mid_pt) )
 		
@@ -69,12 +68,13 @@ if __name__ == '__main__':
 		scales_driver.do_weigh()
 		result = scales_driver.get_weigh_result()
 
+		##The equality case will only occur for the odd case if fake is witheld
 		if result == '=':
-			coins[-1].click()
+			bars[-1].click()
 		else:
 			while mid_pt//2 > 0:
+				##Split the weights of interest based on the weighing result to work with lighter side as it is the one with the fake weight
 				mid_pt //= 2
-				##The lightest weight is on the right so split again
 				if result == '>':
 					left = right[0: mid_pt]
 					right = right[mid_pt:]
@@ -82,24 +82,25 @@ if __name__ == '__main__':
 					right = left[mid_pt:]
 					left = left[0:mid_pt]
 				
+				##Weigh the results again for next comparison
 				scales_driver.do_reset()
 				scales_driver.set_weights('left', left)
 				scales_driver.set_weights('right', right)
 				scales_driver.do_weigh()
 				result = scales_driver.get_weigh_result()
 
-			if result == '>':
-				coins[ right[0] ].click()
-			else: 
-				coins[ left[0] ].click()
+			##At this point there is only one item on each side of the scale
+			fake_index = right[0] if result == '>' else left[0]
+			bars[ fake_index ].click()
 
 		##Verify that the correct element was selected
 		alert = driver.switch_to_alert()
 		assert( alert.text == 'Yay! You find it!')
 		print( alert.text )
+		print(f'Fake one is {fake_index}')
 		alert.accept()
 
-		##Get the weighings
+		##Get the weighings that occurred
 		weighings = scales_driver.get_weighings()
 		assert( len(weighings) > 0 )
 		print( weighings )
