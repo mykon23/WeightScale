@@ -57,6 +57,7 @@ if __name__ == '__main__':
 	try:	
 		scales_driver = GoldBarsScale(driver)
 		bars = scales_driver.get_weights()
+		fake_index = len(bars) - 1
 		
 		##Do an initial comparison between of two equal sized partitions regardless of even or odd number of bars
 		mid_pt = len(bars)//2
@@ -70,7 +71,7 @@ if __name__ == '__main__':
 
 		##The equality case will only occur for the odd case if fake is witheld
 		if result == '=':
-			bars[-1].click()
+			bars[fake_index].click()
 		else:
 			while mid_pt//2 > 0:
 				##Split the weights of interest based on the weighing result to work with lighter side as it is the one with the fake weight
