@@ -9,17 +9,27 @@ class GoldBarsScale:
 		self.driver = driver
 
 	##Returns the number of coins/bars to work with
-	def _get_weights(self):
+	def get_weights(self):
 		coins = self.driver.find_elements_by_xpath("//button[ contains( @id, 'coin_') ]")
 		return coins
 
 	##Returns the weighing results of the scale
-	def _get_weigh_result(self):
+	def get_weigh_result(self):
 		result = self.driver.find_element_by_xpath("//div[@class = 'result']//button")
 		return result.text
 
+	##Returns the weighings that occured throughout the session
+	def get_weighings(self):
+		weighing_items = self.driver.find_elements_by_xpath("//div[@class = 'game-info']//ol//li")
+
+		weighings = []
+		for i in range(len(weighing_items)):
+			weighings.append( weighing_items[i].text )
+
+		return weighings
+
 	##Sets the weights to the corresponding side
-	def _set_weights(self, side, weights):
+	def set_weights(self, side, weights):
 		##TODO: Clean up this code so it doesn't check left or right
 		side_grid = None
 		if side == 'left':
@@ -31,12 +41,12 @@ class GoldBarsScale:
 			side_grid[i].send_keys( weights[i] )
 
 	##Weighs the gold bars on the scale
-	def _do_weigh(self):
+	def do_weigh(self):
 		weigh = self.driver.find_element_by_xpath("//button[ @id = 'weigh']")
 		weigh.click()
 
 	##Resets the scale
-	def _do_reset(self):
+	def do_reset(self):
 		reset = self.driver.find_element_by_xpath("//button[. = 'Reset']")
 		reset.click()
 
@@ -47,17 +57,17 @@ if __name__ == '__main__':
 
 	try:	
 		scales_driver = GoldBarsScale(driver)
-		coins = scales_driver._get_weights()
+		coins = scales_driver.get_weights()
 		
 		## Do the case where one is left out and check for equality
 		mid_pt = len(coins)//2
 		left = list( range(0, mid_pt) )
 		right = list( range(mid_pt, 2 * mid_pt) )
 		
-		scales_driver._set_weights('left', left)
-		scales_driver._set_weights('right', right)
-		scales_driver._do_weigh()
-		result = scales_driver._get_weigh_result()
+		scales_driver.set_weights('left', left)
+		scales_driver.set_weights('right', right)
+		scales_driver.do_weigh()
+		result = scales_driver.get_weigh_result()
 
 		if result == '=':
 			coins[-1].click()
@@ -72,11 +82,11 @@ if __name__ == '__main__':
 					right = left[mid_pt:]
 					left = left[0:mid_pt]
 				
-				scales_driver._do_reset()
-				scales_driver._set_weights('left', left)
-				scales_driver._set_weights('right', right)
-				scales_driver._do_weigh()
-				result = scales_driver._get_weigh_result()
+				scales_driver.do_reset()
+				scales_driver.set_weights('left', left)
+				scales_driver.set_weights('right', right)
+				scales_driver.do_weigh()
+				result = scales_driver.get_weigh_result()
 
 			if result == '>':
 				coins[ right[0] ].click()
@@ -86,7 +96,13 @@ if __name__ == '__main__':
 		##Verify that the correct element was selected
 		alert = driver.switch_to_alert()
 		assert( alert.text == 'Yay! You find it!')
+		print( alert.text )
 		alert.accept()
+
+		##Get the weighings
+		weighings = scales_driver.get_weighings()
+		assert( len(weighings) > 0 )
+		print( weighings )
 		
 	finally:	
 		##Terminate the driver
