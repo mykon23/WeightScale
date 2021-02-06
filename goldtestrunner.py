@@ -1,18 +1,14 @@
 from selenium import webdriver
-import os
+import config
 import unittest
 import weightscale
-
-##Propertier for the driver
-path_to_chrome = os.path.join('.', 'chromedriver')
-url = 'http://ec2-54-208-152-154.compute-1.amazonaws.com/'
 
 class GoldTestRunner(unittest.TestCase):
 
 	def setUp(self):
 		##Set the driver
-		self.driver = webdriver.Chrome( executable_path = path_to_chrome )
-		self.driver.get(url)
+		self.driver = webdriver.Chrome( executable_path = config.path_to_chrome )
+		self.driver.get(config.url)
 
 	def test_find_fake(self):
 
@@ -34,9 +30,7 @@ class GoldTestRunner(unittest.TestCase):
 		result = scales_driver.get_weigh_result()
 
 		##The equality case will only occur for the odd case if fake is witheld
-		if result == '=':
-			bars[fake_index].click()
-		else:
+		if result != '=':
 			while mid_pt//2 > 0:
 				##Split the weights of interest based on the weighing result to work with lighter side as it is the one with the fake weight
 				mid_pt //= 2
@@ -56,12 +50,15 @@ class GoldTestRunner(unittest.TestCase):
 
 			##At this point there is only one item on each side of the scale
 			fake_index = right[0] if result == '>' else left[0]
-			bars[ fake_index ].click()
+
+		##Select the fake weight
+		bar_number = bars[ fake_index ].text
+		bars[ fake_index ].click()
 
 		##Verify that the correct element was selected
 		alert = self.driver.switch_to_alert()
 		assert( alert.text == 'Yay! You find it!')
-		print(f'Fake one is {fake_index}')
+		print(f'Fake one is {bar_number}')
 		print( alert.text )
 		alert.accept()
 
