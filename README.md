@@ -1,25 +1,29 @@
 # WeightScale
 
-Python script that interacts with the webpage http://ec2-54-208-152-154.compute-1.amazonaws.com/ in order to identify the fake/lightest weight.
+Python scripts that interact with webpage http://ec2-54-208-152-154.compute-1.amazonaws.com/ to identify the fake/lightest weight.
+Scripts are composed of the following:
+1.  goldtestrunner.py: contains the algorithm to identify the fake/lightest weight of the collection.
+2.  weightscale.py: contains interaction definitions with the webpage such as loading weights, weighing weights, and reading weighing results.
+3.  config.py: defines path for ChromeDriver executable for goldtestrunner.
 
 ## Requirements to run
-Repository contents must be downloaded onto execution environment.
-Must have Python3.7 installed on the environment intended to execute the scripts.
-Python must be defined in the $PATH variable to ensure Python can be executed from any directory.
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following:
+* Download or clone repository contents onto execution environment.
+* Python 3.7 must be installed on execution environment.  Python downloads can be acquired from https://www.python.org/downloads/.
+* Python must be defined in the __PATH__ variable to ensure Python can be executed from any directory.
+* Use the package manager [pip](https://pip.pypa.io/en/stable/) (Python must be installed) from command line/terminal to install the following:
 
 ```bash
 pip install selenium
 ```
 
-All Python files within the repository are required to be within the same directory in order to execute the scripts. 
-
-Google Chrome is required along with a compatible ChromeDriver executable.  ChromeDriver executables can be downloaded from
-https://chromedriver.chromium.org/downloads.  Download an executable compatible with the Chrome version installed (refer to Help | About Google Chrome) and the script execution environment (Windows/Mac).
-It is recommended that the chromedriver executable be placed within the directory containing Python files: goldtestrunner.py, weighscale.py, and config.py.  If the chromedriver executable is placed elsewhere, update the 'path_to_chrome" value within config.py with the executable's location and executable name.  Note that path must be formatted correctly as in having '/' for Mac and '\\' for Windows.  Note that Windows executable have the .exe extension.
-Chromedriver may need permissions to executed within Mac environment.  Refer to
-https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-if running on Mac.
+* Google Chrome must be installed on the execution environment.  Chrome downloads can be acquired from https://www.google.com/chrome/.
+* Download compatible ChromeDriver executable from https://chromedriver.chromium.org/downloads.  Executable must match installed Chrome version (refer to Help | About Google Chrome) and the script execution environment (Windows/Mac).
+* Copy ChromeDriver executable into directory containing scripts: goldtestrunner.py, weightscale.py, and config.py.  __All files must be in the same directory__.
+* If scripts will be run on Mac environment, provide chromedriver executable permissions to execute.  Refer to https://stackoverflow.com/questions/60362018/macos-catalinav-10-15-3-error-chromedriver-cannot-be-opened-because-the-de
+* Edit config.py __path_to_chrome__ value based on execution environment:  
+    * If running on Mac, set __path_to_chrome ='./chromedriver'__
+    * If running on Windows, set __path_to_chrome = '.\\\\chromedriver.exe'__
+* Cd into directory containing scripts.
 
 ## Identifying the fake/lightest weight
 
@@ -29,5 +33,4 @@ The fake/lightest weight is determined by navigating to the directory containing
 python goldtestrunner.py
 ```
 
-or an approriate version of Python installed on the execution environment.  Note that some environments cally Python2.7 via python command.  Python scripts were developed with Python3.7 which cannot be exectuted with Python2.7 (which is end of life).
-The goldtestrunner.py script contains the algorithm and interactions with the webpage to identify the fake web.  The behavior of the webpage such as loading weighs and reading weighing results is captured within the WeightScale class defined within weighscale.py.  The config.py file contains configurations required for the script execution.
+or an approriate version of Python installed on the execution environment.  Note that some environments call Python 2.7 via python.  If Python 2.7 is called, an error pertaining to print statements shall be displayed on console/terminal.  In case Python 2.7 is called, run command with absolute path of Python 3.7 executable.
