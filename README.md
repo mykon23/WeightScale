@@ -4,27 +4,29 @@ Python script that interacts with the webpage http://ec2-54-208-152-154.compute-
 
 ## Requirements to run
 
-Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following prerequisites.
+Must have Python3.7 installed on the environment intended to execute the scripts.
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following:
 
 ```bash
 pip install selenium
-pip install unittest
 ```
-Requires an environment with Google Chrome update 88 to be compatible with the chromedriver contained within the repository.
-All items within the repository are required to identify the fake/lightest weight.
-Chromedriver may need permissions to execute within MacOS envionrment.  Refer to
-https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
-if running on MAC.
 
+All Python files within the repository are required to be within the same directory in order to execute the scripts. 
+
+Google Chrome is required along with a compatible ChromeDriver executable.  ChromeDriver executables can be downloaded from
+https://chromedriver.chromium.org/downloads.  Download an executable compatible with the Chrome version installed (refer to Help | About Google Chrome) and the script execution environment (Windows/Mac).
+It is recommended that the chromedriver executable be placed within the directory containing Python files: goldtestrunner.py, weighscale.py, and config.py.  If the chromedriver executable is placed elsewhere, update the 'path_to_chrome" value within config.py with the executable's location and executable name.  Note that path must be formatted correctly as in having '/' for Mac and '\\' for Windows.  Note that Windows executable have the .exe extension.
+Chromedriver may need permissions to executed within Mac environment.  Refer to
+https://stackoverflow.com/questions/49787327/selenium-on-mac-message-chromedriver-executable-may-have-wrong-permissions
+if running on Mac.
 
 ## Identifying the fake/lightest weight
 
 The fake/lightest weight is determined by running the goldtestrunner.py script and may be executed via:
 
 ```
-python3 goldtestrunner.py
+python goldtestrunner.py
 ```
 
-or an approriate version of Python installed on the workstation.  The scripts within this repository were tested with Python 3.7 and Python 3.9.
-The goldtestrunner.py is dependent on the weightscale.py and chromedriver contained within the repository and all must be in the same directory.
-The WeightScale class defined within weightscale.py provides interactions with the webpage such as loading weights and reading the weighing results.
+or an approriate version of Python installed on the execution environment.  Note that some environments cally Python2.7 via python command.  Python scripts were developed with Python3.7 which cannot be exectuted with Python2.7 (which is end of life).
+The goldtestrunner.py script contains the algorithm and interactions with the webpage to identify the fake web.  The behavior of the webpage such as loading weighs and reading weighing results is captured within the WeightScale class defined within weighscale.py.  The config.py file contains configurations required for the script execution.
