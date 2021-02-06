@@ -3,8 +3,9 @@
 Python script that interacts with the webpage http://ec2-54-208-152-154.compute-1.amazonaws.com/ in order to identify the fake/lightest weight.
 
 ## Requirements to run
-
+Repository contents must be downloaded onto execution environment.
 Must have Python3.7 installed on the environment intended to execute the scripts.
+Python must be defined in the $PATH variable to ensure Python can be executed from any directory.
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install the following:
 
 ```bash
@@ -22,7 +23,7 @@ if running on Mac.
 
 ## Identifying the fake/lightest weight
 
-The fake/lightest weight is determined by running the goldtestrunner.py script and may be executed via:
+The fake/lightest weight is determined by navigating to the directory containing goldtestrunner.py, weighscale.py, and config.py and running the command:
 
 ```
 python goldtestrunner.py
