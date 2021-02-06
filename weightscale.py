@@ -28,14 +28,16 @@ class WeightScale:
 	def set_weights(self, side, weights):
 		side_grid = None
 		side = side.lower()
-		assert( side == 'left' or side == 'right')
 		if side == 'left':
 			side_grid = self.driver.find_elements_by_xpath("//input[contains(@id, 'left')]")
-		else:
+		elif side == 'right':
 			side_grid = self.driver.find_elements_by_xpath("//input[contains(@id, 'right')]")
+		else:
+			return False
 
 		for i in range(len(weights)):
 			side_grid[i].send_keys( weights[i] )
+		return True
 
 	##Weighs the gold bars on the scale
 	def do_weigh(self):
