@@ -5,4 +5,4 @@
 path_to_chrome = './chromedriver'
 
 ##Weights to work with
-weights = 20
+weights = 9
