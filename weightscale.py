@@ -1,8 +1,14 @@
 class WeightScale:
 	url = 'http://ec2-54-208-152-154.compute-1.amazonaws.com/'
-	def __init__ (self, driver):
+	def __init__ (self, driver, weights = None):
 		self.driver = driver
-		self.driver.get(self.url)
+
+		##Update the url to contain the desired number of weights
+		url = self.url
+		if weights != None and weights > 0:
+			url += '?coins=' + str(weights)
+			
+		self.driver.get(url)
 
 	##Returns the number of coins/bars to work with
 	def get_weights(self):

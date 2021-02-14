@@ -3,3 +3,6 @@
 ##Include path to executable relative or absolute.  
 ##Windows requires .exe extension
 path_to_chrome = './chromedriver'
+
+##Weights to work with
+weights = 20

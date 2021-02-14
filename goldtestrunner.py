@@ -13,7 +13,7 @@ class GoldTestRunner(unittest.TestCase):
 	def test_find_fake(self):
 
 		##Set the scales driver to interact with the webpage
-		scales_driver = weightscale.WeightScale( self.driver )
+		scales_driver = weightscale.WeightScale( self.driver, config.weights )
 		bars = scales_driver.get_weights()
 
 		##Ensure that positive number of bars are available
