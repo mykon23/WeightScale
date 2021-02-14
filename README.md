@@ -4,7 +4,7 @@ Python scripts that interact with webpage http://ec2-54-208-152-154.compute-1.am
 Scripts are composed of the following:
 1.  goldtestrunner.py: contains the algorithm to identify the fake/lightest weight of the collection.
 2.  weightscale.py: contains interaction definitions with the webpage such as loading weights, weighing weights, and reading weighing results.
-3.  config.py: defines path for ChromeDriver executable for goldtestrunner.
+3.  config.py: defines path for ChromeDriver executable for goldtestrunner and the number of weights to search.  Default number of weights is set to 9, but can be configured to integers greater than 0.
 
 ## Requirements to run
 * Download or clone repository contents onto execution environment.
@@ -26,7 +26,7 @@ pip install selenium
 * Cd into directory containing scripts.
 
 ## Identifying the fake/lightest weight
-
+The scripts shall identify the fake weight based on a collection of the size defined within the config.py.  Default value is 9, but may be adjusted by updating the __weights__ variable.
 The fake/lightest weight is determined by navigating to the directory containing goldtestrunner.py, weighscale.py, and config.py and running the command:
 
 ```
