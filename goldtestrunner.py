@@ -1,5 +1,6 @@
 from selenium import webdriver
 import config
+import math
 import unittest
 import weightscale
 
@@ -15,31 +16,36 @@ class GoldTestRunner(unittest.TestCase):
 		scales_driver = weightscale.WeightScale( self.driver )
 		bars = scales_driver.get_weights()
 		
-		##Default the fake index to the last one for the odd case
-		fake_index = len(bars) - 1
-		
-		##Do an initial comparison between of two equal sized partitions regardless of even or odd number of bars
-		##Use bit manipulation to divide and multiply
-		mid_pt = len(bars) >> 1
-		left = list( range(0, mid_pt) )
-		right = list( range(mid_pt, mid_pt << 1) )
-		
+		##Partition the group of weights into three categories for weighing
+		split_pt = math.ceil(len(bars)/3)
+		left = list( range(0, split_pt) )
+		right = list( range(split_pt, 2 * split_pt) )
+		holdon = list( range(2 * split_pt, len(bars)) )
+	
+		##Do an initial comparison	
 		scales_driver.set_weights('left', left)
 		scales_driver.set_weights('right', right)
 		scales_driver.do_weigh()
 		result = scales_driver.get_weigh_result()
 
-		##The equality case will only occur for the odd case if fake is witheld
-		if result != '=':
-			while mid_pt >> 1 > 0:
+		##Add +1 to ensure the two weight case is handled
+		while (split_pt + 1)//3 > 0:
 				##Split the weights of interest based on the weighing result to work with lighter side as it is the one with the fake weight
-				mid_pt >>= 1
+				split_pt = math.ceil(split_pt/3)
 				if result == '>':
-					left = right[0: mid_pt]
-					right = right[mid_pt:]
+					holdon = right[2 * split_pt:]
+					left = right[0: split_pt]
+					right = right[split_pt: 2 * split_pt]
+				elif result == '<':
+					holdon = left[2 * split_pt:]
+					right = left[split_pt: 2 * split_pt]
+					left = left[0: split_pt]
 				else:
-					right = left[mid_pt:]
-					left = left[0:mid_pt]
+					if len(holdon) == 1:
+						break
+					left = holdon[0: split_pt]
+					right = holdon[split_pt: 2 * split_pt]
+					holdon = holdon[2 * split_pt:]
 				
 				##Weigh the items again for next comparison
 				scales_driver.do_reset()
@@ -48,8 +54,14 @@ class GoldTestRunner(unittest.TestCase):
 				scales_driver.do_weigh()
 				result = scales_driver.get_weigh_result()
 
-			##At this point there is only one item on each side of the scale
-			fake_index = right[0] if result == '>' else left[0]
+		##Set the fake index according to the results
+		fake_index = -1
+		if result == '<':
+			fake_index = left[0]
+		elif result == '>':
+			fake_index = right[0]
+		else:
+			fake_index = holdon[0]
 
 		##Select the fake weight
 		bar_number = bars[ fake_index ].text
