@@ -1,5 +1,6 @@
 from selenium import webdriver
 import config
+import math
 import unittest
 import weightscale
 
@@ -12,44 +13,41 @@ class GoldTestRunner(unittest.TestCase):
 	def test_find_fake(self):
 
 		##Set the scales driver to interact with the webpage
-		scales_driver = weightscale.WeightScale( self.driver )
+		scales_driver = weightscale.WeightScale( self.driver, config.weights )
 		bars = scales_driver.get_weights()
-		
-		##Default the fake index to the last one for the odd case
-		fake_index = len(bars) - 1
-		
-		##Do an initial comparison between of two equal sized partitions regardless of even or odd number of bars
-		##Use bit manipulation to divide and multiply
-		mid_pt = len(bars) >> 1
-		left = list( range(0, mid_pt) )
-		right = list( range(mid_pt, mid_pt << 1) )
-		
-		scales_driver.set_weights('left', left)
-		scales_driver.set_weights('right', right)
-		scales_driver.do_weigh()
-		result = scales_driver.get_weigh_result()
 
-		##The equality case will only occur for the odd case if fake is witheld
-		if result != '=':
-			while mid_pt >> 1 > 0:
-				##Split the weights of interest based on the weighing result to work with lighter side as it is the one with the fake weight
-				mid_pt >>= 1
-				if result == '>':
-					left = right[0: mid_pt]
-					right = right[mid_pt:]
-				else:
-					right = left[mid_pt:]
-					left = left[0:mid_pt]
-				
-				##Weigh the items again for next comparison
-				scales_driver.do_reset()
-				scales_driver.set_weights('left', left)
-				scales_driver.set_weights('right', right)
-				scales_driver.do_weigh()
-				result = scales_driver.get_weigh_result()
+		##Ensure that positive number of bars are available
+		assert( len(bars) > 0 )
 
-			##At this point there is only one item on each side of the scale
-			fake_index = right[0] if result == '>' else left[0]
+		##Set the working weights
+		work = list( range(0, len(bars)) )
+
+		##Process the weights until only the single, fake remains
+		while len(work) > 1:
+
+			##Partition the group of weights into three categories for weighing
+			split_pt = math.ceil(len(work)/3)
+			left = work[0: split_pt]
+			right = work[split_pt: 2 * split_pt]
+			holdon = work[2 * split_pt:]
+
+			##Weight the items to determine the next set of working weights
+			scales_driver.do_reset()
+			scales_driver.set_weights('left', left)
+			scales_driver.set_weights('right', right)
+			scales_driver.do_weigh()
+			result = scales_driver.get_weigh_result()
+
+			##Update the working weights according to the left/right results
+			if result == '>':
+				work = right
+			elif result == '<':
+				work = left
+			else:
+				work = holdon
+
+		##Only the fake should be leftover
+		fake_index = work[0]
 
 		##Select the fake weight
 		bar_number = bars[ fake_index ].text
@@ -64,7 +62,6 @@ class GoldTestRunner(unittest.TestCase):
 
 		##Get the weighings that occurred
 		weighings = scales_driver.get_weighings()
-		assert( len(weighings) > 0 )
 		print(f'Number of weighings that occured: {len(weighings)}')
 		print('\n'.join( w for w in  weighings ))
 

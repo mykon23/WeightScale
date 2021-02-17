@@ -1,8 +1,14 @@
 class WeightScale:
 	url = 'http://ec2-54-208-152-154.compute-1.amazonaws.com/'
-	def __init__ (self, driver):
+	def __init__ (self, driver, weights = None):
 		self.driver = driver
-		self.driver.get(self.url)
+
+		##Update the url to contain the desired number of weights
+		url = self.url
+		if weights != None and weights > 0:
+			url += '?coins=' + str(weights)
+			
+		self.driver.get(url)
 
 	##Returns the number of coins/bars to work with
 	def get_weights(self):
@@ -26,18 +32,16 @@ class WeightScale:
 
 	##Sets the weights to the corresponding side
 	def set_weights(self, side, weights):
-		side_grid = None
 		side = side.lower()
-		if side == 'left':
-			side_grid = self.driver.find_elements_by_xpath("//input[contains(@id, 'left')]")
-		elif side == 'right':
-			side_grid = self.driver.find_elements_by_xpath("//input[contains(@id, 'right')]")
-		else:
-			return False
+		if side == 'left' or side == 'right':
+			xpath = "//input[contains(@id, " + "\'" + side + "\'" + ")]"
+			side_grid = self.driver.find_elements_by_xpath(xpath)
 
-		for i in range(len(weights)):
-			side_grid[i].send_keys( weights[i] )
-		return True
+			for i in range(len(weights)):
+				side_grid[i].send_keys( weights[i] )
+			return True
+
+		return False
 
 	##Weighs the gold bars on the scale
 	def do_weigh(self):
